@@ -95,7 +95,7 @@ declare function xutil:ns-clean-deep-recurse(
           let $prefix := map:get($reverse-map, $ns)
           return
           element {
-            QName (
+            fn:QName (
               $ns,
               concat(
                 $prefix,
@@ -103,12 +103,13 @@ declare function xutil:ns-clean-deep-recurse(
                     ''
                   else
                     ':',
-                local-name($node) ) ) } { $node/@*,
+                fn:local-name($node) ) ) } { $node/@*,
                 xutil:ns-clean-deep-recurse($node/node(), $ns-map) }
         )
 
         else
-        ( $node,
+        (
+          $node,
           xutil:ns-clean-deep-recurse($node/node(), $ns-map)
         )
       else
