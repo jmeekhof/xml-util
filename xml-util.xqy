@@ -116,3 +116,22 @@ declare function xutil:ns-clean-deep-recurse(
         $node
 };
 
+(:~
+ : Recursively walks through a node and removes the empty elements
+ : @param $element the node you want to have the empty elements removed
+ : @return the element with all the empty nodes removed
+ :)
+declare function xutil:remove-empty-elements($element as element()) as element()? {
+  if ( $element/* or $element/text() ) then
+    element { fn:node-name($element) } {
+      $element/@*, $element/node() !
+      (
+        if ( . instance of element() ) then
+          xutil:remove-empty-elements(.)
+        else
+          .
+      )
+    }
+  else
+    ()
+};
