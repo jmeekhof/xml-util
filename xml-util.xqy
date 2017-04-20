@@ -2,6 +2,8 @@ xquery version '1.0-ml';
 
 module namespace xutil = "http://twotheleft.com/xml-util";
 
+declare option xdmp:mapping "false";
+
 (:~
  : This functions takes a sequence of strings, or a map and returns a map made
  : by alternating the values as key value pairs
@@ -118,20 +120,26 @@ declare function xutil:ns-clean-deep-recurse(
 
 (:~
  : Recursively walks through a node and removes the empty elements
- : @param $element the node you want to have the empty elements removed
+ : @param $node the node you want to have the empty elements removed
  : @return the element with all the empty nodes removed
  :)
-declare function xutil:remove-empty-elements($element as element()) as element()? {
-  if ( $element/* or $element/text() ) then
-    element { fn:node-name($element) } {
-      $element/@*, $element/node() !
-      (
-        if ( . instance of element() ) then
-          xutil:remove-empty-elements(.)
-        else
-          .
-      )
-    }
-  else
-    ()
+declare function xutil:remove-empty-elements($node as node()) as element()? {
+  let $element :=
+    if ($node instance of document-node() ) then
+      $node/*
+    else
+      $node
+  return
+    if ( $element/* or $element/text() ) then
+      element { fn:node-name($element) } {
+        $element/@*, $element/node() !
+        (
+          if ( . instance of element() ) then
+            xutil:remove-empty-elements(.)
+          else
+            .
+        )
+      }
+    else
+      ()
 };
